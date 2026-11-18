@@ -7,12 +7,12 @@ export default function WelcomeScreen() {
   return <SafeAreaView style={s.screen}>
     <View style={s.hero}>
       <View style={s.logo}><Text style={s.logoText}>용</Text></View>
-      <Text style={s.eyebrow}>프랜차이즈 긴급 인력 매칭</Text>
+      <Text style={s.eyebrow}>프랜차이즈 카페 긴급 인력 매칭</Text>
       <Text style={s.title}>갑자기 생긴 빈자리,{`\n`}경력 있는 용병으로.</Text>
-      <Text style={s.description}>일해본 브랜드의 근로자와 지금 필요한 매장을 빠르고 믿을 수 있게 연결해요.</Text>
+      <Text style={s.description}>일해본 커피 브랜드의 근로자와 지금 필요한 카페 매장을 빠르고 믿을 수 있게 연결해요.</Text>
       <View style={s.preview}>
         <View style={s.previewTop}><Text style={s.previewLabel}>오늘의 긴급 공고</Text><Text style={s.live}>● LIVE</Text></View>
-        <Text style={s.store}>스타카페 강남역점</Text>
+        <Text style={s.store}>메가MGC커피 강남역점</Text>
         <Text style={s.shift}>오늘 18:00–22:00 · 시급 15,000원</Text>
         <View style={s.chip}><Text style={s.chipText}>경력 인증자 우선 매칭</Text></View>
       </View>

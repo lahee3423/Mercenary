@@ -6,12 +6,13 @@ import { colors } from '../theme';
 
 type Role = 'worker' | 'owner';
 const roles = [
-  {id:'worker' as const,icon:'⚡',title:'근로자로 일할래요',copy:'경력 있는 브랜드의 긴급 근무를 찾아요'},
-  {id:'owner' as const,icon:'🏪',title:'점주로 구인할래요',copy:'우리 매장에 바로 투입할 경력자를 찾아요'},
+  {id:'worker' as const,icon:'⚡',title:'근로자로 일할래요',copy:'경력 있는 커피 브랜드의 긴급 근무를 찾아요'},
+  {id:'owner' as const,icon:'☕',title:'점주로 구인할래요',copy:'우리 카페에 바로 투입할 경력자를 찾아요'},
 ];
 
 export default function OnboardingScreen(){
-  const [role,setRole]=useState<Role>('worker'); const [brand,setBrand]=useState('스타카페');
+  const [role,setRole]=useState<Role>('worker'); const [brands,setBrands]=useState(['메가MGC커피']);
+  const selectBrand=(brand:string)=>setBrands(current=>role==='owner'?[brand]:current.includes(brand)?(current.length===1?current:current.filter(item=>item!==brand)):[...current,brand]);
   return <SafeAreaView style={s.screen} edges={['top','bottom']}>
     <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
       <View style={s.progress}><View style={s.progressFill}/></View><Text style={s.step}>1 / 2</Text>
@@ -19,8 +20,8 @@ export default function OnboardingScreen(){
       <View style={s.roleList}>{roles.map(item=>{const selected=role===item.id;return <Pressable key={item.id} onPress={()=>setRole(item.id)} style={[s.roleCard,selected&&s.roleSelected]}>
         <Text style={s.roleIcon}>{item.icon}</Text><View style={s.roleCopy}><Text style={s.roleTitle}>{item.title}</Text><Text style={s.roleDescription}>{item.copy}</Text></View><View style={[s.radio,selected&&s.radioSelected]}>{selected&&<View style={s.radioDot}/>}</View>
       </Pressable>})}</View>
-      <Text style={s.sectionTitle}>{role==='worker'?'일해본 브랜드':'운영 중인 브랜드'}</Text><Text style={s.helper}>{role==='worker'?'경력 인증은 다음 단계에서 진행해요.':'매장 등록은 다음 단계에서 진행해요.'}</Text>
-      <View style={s.brandGrid}>{['스타카페','버거하우스','치킨데이','편의24'].map(item=><Pressable key={item} onPress={()=>setBrand(item)} style={[s.brand,brand===item&&s.brandSelected]}><Text style={s.brandMark}>{item[0]}</Text><Text style={[s.brandText,brand===item&&s.brandTextSelected]}>{item}</Text></Pressable>)}</View>
+      <Text style={s.sectionTitle}>{role==='worker'?'일해본 커피 브랜드':'운영 중인 커피 브랜드'}</Text><Text style={s.helper}>{role==='worker'?'1개 이상 선택 · 복수 선택 가능':'카페 매장 등록은 다음 단계에서 진행해요.'}</Text>
+      <View style={s.brandGrid}>{['메가MGC커피','컴포즈커피','빽다방','이디야커피','투썸플레이스','더벤티'].map(item=>{const selected=brands.includes(item);return <Pressable key={item} onPress={()=>selectBrand(item)} style={[s.brand,selected&&s.brandSelected]}><Text style={s.brandMark}>{item[0]}</Text><Text style={[s.brandText,selected&&s.brandTextSelected]} numberOfLines={1}>{item}</Text></Pressable>})}</View>
     </ScrollView>
     <View style={s.footer}><Pressable style={s.button} onPress={()=>router.replace({pathname:'/dashboard/[role]',params:{role}})}><Text style={s.buttonText}>다음</Text></Pressable></View>
   </SafeAreaView>;

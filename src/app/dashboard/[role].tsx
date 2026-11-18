@@ -32,7 +32,7 @@ function ScreenHeader({eyebrow,title}:{eyebrow:string;title:string}){return <Vie
 
 function WorkerHome(){return <>
   <ScreenHeader eyebrow="김용병님, 안녕하세요" title="오늘 가능한 근무를 찾았어요"/>
-  <View style={s.statusCard}><View><Text style={s.statusEyebrow}>다음 확정 근무</Text><Text style={s.statusTitle}>스타카페 강남역점</Text><Text style={s.statusMeta}>오늘 18:00–22:00 · 4시간</Text></View><Pressable style={s.statusButton}><Text style={s.statusButtonText}>출근 준비</Text></Pressable></View>
+  <View style={s.statusCard}><View><Text style={s.statusEyebrow}>다음 확정 근무</Text><Text style={s.statusTitle}>메가MGC커피 강남역점</Text><Text style={s.statusMeta}>오늘 18:00–22:00 · 4시간</Text></View><Pressable style={s.statusButton}><Text style={s.statusButtonText}>출근 준비</Text></Pressable></View>
   <View style={s.sectionHeader}><Text style={s.sectionTitle}>추천 긴급 공고</Text><Text style={s.more}>전체보기</Text></View><WorkerJobs/>
   <Text style={[s.sectionTitle,{marginTop:30}]}>내 경력 현황</Text><Insight number="12" title="인증 근무 12회" copy="평점 4.9 · 노쇼 없이 성실하게 근무했어요"/>
 </>}
@@ -42,23 +42,23 @@ function JobsScreen(){return <>
   <View style={s.searchBox}><Text style={s.searchIcon}>⌕</Text><Text style={s.searchPlaceholder}>지역·브랜드 검색</Text></View>
   <View style={s.filters}>{['오늘','경력 일치','거리순'].map((item,i)=><Pressable key={item} style={[s.filter,i===0&&s.filterActive]}><Text style={[s.filterText,i===0&&s.filterTextActive]}>{item}{i===2?' ⌄':''}</Text></Pressable>)}</View>
   <View style={s.resultHeader}><Text style={s.sectionTitle}>지금 지원 가능</Text><Text style={s.resultCount}>6개 공고</Text></View><WorkerJobs/>
-  <View style={s.jobCard}><View style={[s.brandLogo,{backgroundColor:colors.greenSoft}]}><Text style={s.brandLogoText}>편</Text></View><View style={{flex:1}}><Text style={s.jobTitle}>편의24 논현점</Text><Text style={s.jobTime}>내일 12:00–17:00</Text><View style={s.jobBottom}><Text style={s.pay}>시급 14,500원</Text><Text style={s.badge}>1.4km</Text></View></View></View>
+  <View style={s.jobCard}><View style={[s.brandLogo,{backgroundColor:colors.greenSoft}]}><Text style={s.brandLogoText}>이</Text></View><View style={{flex:1}}><Text style={s.jobTitle}>이디야커피 논현점</Text><Text style={s.jobTime}>내일 12:00–17:00</Text><View style={s.jobBottom}><Text style={s.pay}>시급 14,500원</Text><Text style={s.badge}>1.4km</Text></View></View></View>
 </>}
 
 function ScheduleScreen(){return <>
   <ScreenHeader eyebrow="2026년 11월" title="근무일정"/>
   <View style={s.weekRow}>{[['월','16'],['화','17'],['수','18'],['목','19'],['금','20']].map((d,i)=><View key={d[0]} style={[s.day,i===2&&s.dayActive]}><Text style={[s.dayName,i===2&&s.dayTextActive]}>{d[0]}</Text><Text style={[s.dayNumber,i===2&&s.dayTextActive]}>{d[1]}</Text></View>)}</View>
   <Text style={[s.sectionTitle,{marginTop:28}]}>오늘의 근무</Text>
-  <View style={s.scheduleCard}><View style={s.timeRail}><Text style={s.timeText}>18:00</Text><View style={s.rail}/><Text style={s.timeText}>22:00</Text></View><View style={s.scheduleInfo}><View style={s.confirmed}><Text style={s.confirmedText}>확정</Text></View><Text style={s.scheduleTitle}>스타카페 강남역점</Text><Text style={s.scheduleMeta}>마감 보조 · 서울 강남구</Text><Pressable style={s.outlineButton}><Text style={s.outlineButtonText}>근무 상세보기</Text></Pressable></View></View>
-  <Text style={[s.sectionTitle,{marginTop:30}]}>다가오는 일정</Text><View style={s.upcoming}><Text style={s.upcomingDate}>11. 21{`\n`}토요일</Text><View style={s.divider}/><View><Text style={s.upcomingTitle}>버거하우스 신논현점</Text><Text style={s.upcomingMeta}>19:00–23:00 · 4시간</Text></View></View>
+  <View style={s.scheduleCard}><View style={s.timeRail}><Text style={s.timeText}>18:00</Text><View style={s.rail}/><Text style={s.timeText}>22:00</Text></View><View style={s.scheduleInfo}><View style={s.confirmed}><Text style={s.confirmedText}>확정</Text></View><Text style={s.scheduleTitle}>메가MGC커피 강남역점</Text><Text style={s.scheduleMeta}>마감 보조 · 서울 강남구</Text><Pressable style={s.outlineButton}><Text style={s.outlineButtonText}>근무 상세보기</Text></Pressable></View></View>
+  <Text style={[s.sectionTitle,{marginTop:30}]}>다가오는 일정</Text><View style={s.upcoming}><Text style={s.upcomingDate}>11. 21{`\n`}토요일</Text><View style={s.divider}/><View><Text style={s.upcomingTitle}>컴포즈커피 신논현점</Text><Text style={s.upcomingMeta}>19:00–23:00 · 4시간</Text></View></View>
 </>}
 
 function ChatScreen(){return <>
   <ScreenHeader eyebrow="매칭된 매장과 대화해요" title="채팅"/>
   <View style={s.chatNotice}><Text style={s.chatNoticeIcon}>!</Text><Text style={s.chatNoticeText}>개인정보와 외부 연락처 공유에 주의해주세요.</Text></View>
   <View style={s.chatList}>{[
-    ['스','스타카페 강남역점','네, 검정 바지 착용하고 와주세요!','오후 2:18','2'],
-    ['버','버거하우스 신논현점','지원이 확정되었습니다.','어제',''],
+    ['메','메가MGC커피 강남역점','네, 검정 바지 착용하고 와주세요!','오후 2:18','2'],
+    ['컴','컴포즈커피 신논현점','지원이 확정되었습니다.','어제',''],
   ].map(chat=><Pressable key={chat[1]} style={s.chatRow}><View style={s.chatAvatar}><Text style={s.brandLogoText}>{chat[0]}</Text></View><View style={s.chatCopy}><Text style={s.chatName}>{chat[1]}</Text><Text numberOfLines={1} style={s.chatMessage}>{chat[2]}</Text></View><View style={s.chatSide}><Text style={s.chatTime}>{chat[3]}</Text>{chat[4]?<View style={s.unread}><Text style={s.unreadText}>{chat[4]}</Text></View>:null}</View></Pressable>)}</View>
 </>}
 
@@ -78,9 +78,9 @@ function OwnerHome(){return <>
 function Insight({number,title,copy}:{number:string;title:string;copy:string}){return <View style={s.insightCard}><View style={s.insightIcon}><Text style={s.insightIconText}>{number}</Text></View><View style={{flex:1}}><Text style={s.insightTitle}>{title}</Text><Text style={s.insightCopy}>{copy}</Text></View></View>}
 
 function WorkerJobs(){return <View style={s.cards}>{[
-  ['버거하우스 신논현점','오늘 19:00–23:00','시급 16,000원','도보 12분'],['스타카페 역삼점','내일 07:00–11:00','시급 15,000원','경력 일치'],
+  ['컴포즈커피 신논현점','오늘 19:00–23:00','시급 16,000원','도보 12분'],['메가MGC커피 역삼점','내일 07:00–11:00','시급 15,000원','경력 일치'],
 ].map((job,i)=><View style={s.jobCard} key={job[0]}><View style={s.brandLogo}><Text style={s.brandLogoText}>{job[0][0]}</Text></View><View style={{flex:1}}><Text style={s.jobTitle}>{job[0]}</Text><Text style={s.jobTime}>{job[1]}</Text><View style={s.jobBottom}><Text style={s.pay}>{job[2]}</Text><Text style={[s.badge,i===1&&s.matchBadge]}>{job[3]}</Text></View></View></View>)}</View>}
-function OwnerQuick(){return <View style={s.quickRow}>{[['☕','오픈'],['🍔','피크타임'],['🌙','마감']].map(item=><Pressable key={item[1]} style={s.quick}><Text style={s.quickIcon}>{item[0]}</Text><Text style={s.quickText}>{item[1]}</Text><Text style={s.quickMeta}>템플릿</Text></Pressable>)}</View>}
+function OwnerQuick(){return <View style={s.quickRow}>{[['🌅','오픈'],['☕','피크타임'],['🌙','마감']].map(item=><Pressable key={item[1]} style={s.quick}><Text style={s.quickIcon}>{item[0]}</Text><Text style={s.quickText}>{item[1]}</Text><Text style={s.quickMeta}>카페 템플릿</Text></Pressable>)}</View>}
 
 const s=StyleSheet.create({
   screen:{flex:1,width:'100%',maxWidth:430,alignSelf:'center',backgroundColor:colors.background},content:{padding:24,paddingBottom:120},header:{flexDirection:'row',justifyContent:'space-between',alignItems:'center',marginTop:8},hello:{color:colors.muted,fontSize:13,fontWeight:'700'},heading:{color:colors.ink,fontSize:24,fontWeight:'900',marginTop:6,letterSpacing:-.5},bell:{width:42,height:42,borderRadius:15,backgroundColor:colors.surface,alignItems:'center',justifyContent:'center'},bellText:{color:colors.ink,fontSize:19,fontWeight:'900'},
