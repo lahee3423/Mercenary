@@ -25,7 +25,7 @@ export default function WelcomeScreen() {
 }
 
 const s = StyleSheet.create({
-  screen:{flex:1,backgroundColor:colors.background,paddingHorizontal:24},hero:{flex:1,justifyContent:'center'},
+  screen:{flex:1,width:'100%',maxWidth:430,alignSelf:'center',backgroundColor:colors.background,paddingHorizontal:24},hero:{flex:1,justifyContent:'center'},
   logo:{width:52,height:52,borderRadius:18,backgroundColor:colors.ink,alignItems:'center',justifyContent:'center',marginBottom:28},logoText:{color:'#fff',fontSize:25,fontWeight:'900'},
   eyebrow:{color:colors.primary,fontSize:14,fontWeight:'800',marginBottom:12},title:{color:colors.ink,fontSize:34,lineHeight:44,fontWeight:'900',letterSpacing:-1},description:{color:colors.muted,fontSize:16,lineHeight:25,marginTop:18,maxWidth:330},
   preview:{backgroundColor:colors.surface,borderRadius:24,marginTop:36,padding:22,shadowColor:colors.ink,shadowOpacity:.08,shadowRadius:20,shadowOffset:{width:0,height:8},elevation:3},previewTop:{flexDirection:'row',justifyContent:'space-between',marginBottom:20},previewLabel:{color:colors.muted,fontWeight:'700'},live:{color:colors.primary,fontSize:12,fontWeight:'900'},store:{color:colors.ink,fontSize:20,fontWeight:'900'},shift:{color:colors.muted,fontSize:14,marginTop:8},chip:{alignSelf:'flex-start',backgroundColor:colors.greenSoft,borderRadius:10,paddingHorizontal:10,paddingVertical:7,marginTop:18},chipText:{color:colors.green,fontSize:12,fontWeight:'800'},
