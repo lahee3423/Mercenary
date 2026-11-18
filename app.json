@@ -1,0 +1,32 @@
+{
+  "expo": {
+    "name": "용병",
+    "slug": "mercenary",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "mercenary",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.lahee3423.mercenary"
+    },
+    "android": {
+      "package": "com.lahee3423.mercenary",
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "experiments": { "typedRoutes": true }
+  }
+}
