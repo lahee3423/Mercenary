@@ -39,7 +39,7 @@ export default function DashboardScreen(){
   const navigationTabs=owner?ownerTabs:workerTabs;
   return <SafeAreaView style={s.screen} edges={['top','bottom']}>
     <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
-      <AppHeader tabIcon={(navigationTabs.find(item=>item.key===tab)?.icon??'home') as keyof typeof tabIcons}/>
+      <AppHeader tabIcon={(navigationTabs.find(item=>item.key===tab)?.icon??'home') as keyof typeof tabIcons} slogan={owner?'오늘의 지원군을 소환하세요.':'오늘의 임무, 수락하시겠습니까?'}/>
       {owner?<OwnerScreen tab={tab} setTab={setTab}/>:<WorkerScreen tab={tab}/>}
     </ScrollView>
     <View style={s.tabBar}>{navigationTabs.map(item=>{const Icon=tabIcons[item.icon as keyof typeof tabIcons];const active=tab===item.key;return <Pressable key={item.key} onPress={()=>setTab(item.key)} style={s.tab}><Icon size={19} color={active?colors.primary:'#858B97'} strokeWidth={2}/><Text style={[s.tabLabel,active&&s.tabActive]}>{item.label}</Text></Pressable>})}</View>
@@ -54,7 +54,7 @@ function WorkerScreen({tab}:{tab:TabKey}){
   return <WorkerHome/>;
 }
 
-function AppHeader({tabIcon}:{tabIcon:keyof typeof tabIcons}){const TabIcon=tabIcons[tabIcon];return <View style={s.header}><View style={s.headerCopy}><View style={s.brandRow}><Text style={s.appName}>용⚔️병</Text><View style={s.headerTabBadge}><TabIcon size={15} color={colors.primary} strokeWidth={2.3}/></View></View><Text style={s.appSlogan}>필요한 순간, 바로 연결</Text></View><Pressable style={s.bell}><Bell size={19} color={colors.ink} strokeWidth={2}/><View style={s.notificationDot}/></Pressable></View>}
+function AppHeader({tabIcon,slogan}:{tabIcon:keyof typeof tabIcons;slogan:string}){const TabIcon=tabIcons[tabIcon];return <View style={s.header}><View style={s.headerCopy}><View style={s.brandRow}><Text style={s.appName}>용⚔️병</Text><View style={s.headerTabBadge}><TabIcon size={15} color={colors.primary} strokeWidth={2.3}/></View></View><Text style={s.appSlogan}>{slogan}</Text></View><Pressable style={s.bell}><Bell size={19} color={colors.ink} strokeWidth={2}/><View style={s.notificationDot}/></Pressable></View>}
 
 function WorkerHome(){return <>
   <View style={s.statusCard}><View><Text style={s.statusEyebrow}>다음 확정 근무</Text><Text style={s.statusTitle}>메가MGC커피 강남역점</Text><Text style={s.statusMeta}>오늘 18:00–22:00 · 4시간</Text></View><Pressable style={s.statusButton}><Text style={s.statusButtonText}>출근 준비</Text></Pressable></View>
