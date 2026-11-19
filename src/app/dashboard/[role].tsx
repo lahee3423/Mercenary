@@ -3,6 +3,7 @@ import { AlertCircle, Bell, CalendarCheck, CalendarDays, CalendarRange, Check, C
 import { useMemo, useState } from 'react';
 import { Image, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import NaverMap from '../../components/NaverMap';
 import { formatPay, Job, jobs } from '../../data/jobs';
 import { colors } from '../../theme';
 
@@ -15,6 +16,9 @@ const ownerTabs:{key:TabKey;icon:string;label:string}[]=[
   {key:'home',icon:'home',label:'홈'},{key:'jobs',icon:'recruit',label:'구인등록'},{key:'work',icon:'manage',label:'근무관리'},{key:'chat',icon:'chat',label:'채팅'},{key:'my',icon:'user',label:'마이'},
 ];
 const tabIcons={home:Home,search:Search,calendar:CalendarDays,recruit:ClipboardPlus,manage:CalendarCheck,chat:MessageCircle,user:UserRound};
+const JOB_COORDINATES:Record<string,{latitude:number;longitude:number}>={
+  'compose-sinnonhyeon':{latitude:37.5064,longitude:127.0241},'mega-yeoksam':{latitude:37.5008,longitude:127.0365},'ediya-nonhyeon':{latitude:37.5111,longitude:127.0217},'paik-gangnam':{latitude:37.4978,longitude:127.0276},'twosome-seolleung':{latitude:37.5033,longitude:127.0488},'venti-sinsa':{latitude:37.5166,longitude:127.0202},'compose-gangnamgu':{latitude:37.5174,longitude:127.0474},'mega-daechi':{latitude:37.4982,longitude:127.0597},'ediya-apgujeong':{latitude:37.5282,longitude:127.0304},'paik-samseong':{latitude:37.5128,longitude:127.0492},
+};
 const NOW=new Date();
 const TODAY_KEY=`${NOW.getFullYear()}-${NOW.getMonth()+1}-${NOW.getDate()}`;
 const WORK_DAYS=new Set(['2026-11-19','2026-11-20','2026-11-21','2026-11-25','2026-12-2']);
@@ -84,14 +88,10 @@ function KeywordJobs(){
   </>;
 }
 
-function MapJobs(){const [today,setToday]=useState(false);const [matched,setMatched]=useState(false);const available=jobs.filter(job=>(!today||job.isToday)&&(!matched||job.matched));const selected=available[0];return <>
+function MapJobs(){const [today,setToday]=useState(false);const [matched,setMatched]=useState(false);const [selectedId,setSelectedId]=useState(jobs[0].id);const available=jobs.filter(job=>(!today||job.isToday)&&(!matched||job.matched));const selected=available.find(job=>job.id===selectedId)??available[0];const markers=available.map(job=>({...JOB_COORDINATES[job.id],id:job.id,label:`${job.brand} ${job.store}`}));return <>
   <View style={s.mapFilters}><FilterButton label="오늘" active={today} onPress={()=>setToday(value=>!value)}/><FilterButton label="경력 일치" active={matched} onPress={()=>setMatched(value=>!value)}/><View style={{flex:1}}/><Pressable style={s.locationButton}><Crosshair size={13} color={colors.ink}/><Text style={s.locationText}>현 위치</Text></Pressable></View>
   <View style={s.map}>
-    <View style={[s.road,{top:70,left:-30,width:440,transform:[{rotate:'-8deg'}]}]}/><View style={[s.road,{top:190,left:-35,width:440,transform:[{rotate:'11deg'}]}]}/><View style={[s.roadVertical,{top:-20,left:185,height:390,transform:[{rotate:'6deg'}]}]}/>
-    <View style={[s.block,{top:24,left:28,width:100,height:72}]}/><View style={[s.block,{top:105,left:250,width:94,height:82}]}/><View style={[s.block,{top:225,left:30,width:120,height:76}]}/><View style={[s.block,{top:250,left:245,width:105,height:70}]}/>
-    <Text style={[s.mapLabel,{top:41,left:44}]}>논현동</Text><Text style={[s.mapLabel,{top:274,left:264}]}>역삼동</Text>
-    <View style={[s.pin,{top:95,left:80}]}><Text style={s.pinText}>{Math.min(available.length,2)}</Text></View><View style={[s.pin,{top:135,left:270}]}><Text style={s.pinText}>1</Text></View><View style={[s.pin,s.pinSelected,{top:205,left:173}]}><Text style={s.pinText}>{Math.min(available.length,9)}</Text></View><View style={[s.pin,{top:265,left:315}]}><Text style={s.pinText}>1</Text></View>
-    <View style={s.myLocation}><View style={s.myLocationDot}/></View>
+    <NaverMap markers={markers} onSelect={setSelectedId}/>
   </View>
   {selected&&<View style={s.mapSummary}><View style={s.mapSummaryTop}><Text style={s.mapSummaryLabel}>선택한 지역의 공고</Text><Text style={s.resultCount}>반경 4km · {available.length}개</Text></View><Pressable onPress={()=>openJob(selected.id)} style={s.mapJob}><View style={s.brandLogo}><Text style={s.brandLogoText}>{selected.brand.slice(0,1)}</Text></View><View style={{flex:1}}><Text style={s.jobTitle}>{selected.brand} {selected.store}</Text><Text style={s.jobTime}>{selected.dateLabel} {selected.time} · {selected.distance}km</Text><Text style={s.pay}>{formatPay(selected.hourlyPay)}</Text></View><ChevronRight size={24} color="#858B97"/></Pressable></View>}
 </>}
