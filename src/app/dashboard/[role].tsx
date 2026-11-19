@@ -39,6 +39,7 @@ export default function DashboardScreen(){
   const navigationTabs=owner?ownerTabs:workerTabs;
   return <SafeAreaView style={s.screen} edges={['top','bottom']}>
     <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
+      <AppHeader tabLabel={navigationTabs.find(item=>item.key===tab)?.label??'홈'}/>
       {owner?<OwnerScreen tab={tab} setTab={setTab}/>:<WorkerScreen tab={tab}/>}
     </ScrollView>
     <View style={s.tabBar}>{navigationTabs.map(item=>{const Icon=tabIcons[item.icon as keyof typeof tabIcons];const active=tab===item.key;return <Pressable key={item.key} onPress={()=>setTab(item.key)} style={s.tab}><Icon size={19} color={active?colors.primary:'#858B97'} strokeWidth={2}/><Text style={[s.tabLabel,active&&s.tabActive]}>{item.label}</Text></Pressable>})}</View>
@@ -53,10 +54,9 @@ function WorkerScreen({tab}:{tab:TabKey}){
   return <WorkerHome/>;
 }
 
-function ScreenHeader({eyebrow,title}:{eyebrow:string;title:string}){return <View style={s.header}><View><Text style={s.hello}>{eyebrow}</Text><Text style={s.heading}>{title}</Text></View><View style={s.bell}><Bell size={19} color={colors.ink} strokeWidth={2}/></View></View>}
+function AppHeader({tabLabel}:{tabLabel:string}){return <View style={s.header}><View style={s.headerCopy}><View style={s.brandRow}><Text style={s.appName}>용병앱</Text><View style={s.headerTabBadge}><Text style={s.headerTabText}>{tabLabel}</Text></View></View><Text style={s.appSlogan}>필요한 순간, 바로 연결</Text></View><Pressable style={s.bell}><Bell size={19} color={colors.ink} strokeWidth={2}/><View style={s.notificationDot}/></Pressable></View>}
 
 function WorkerHome(){return <>
-  <ScreenHeader eyebrow="김용병님, 안녕하세요" title="오늘 가능한 근무를 찾았어요"/>
   <View style={s.statusCard}><View><Text style={s.statusEyebrow}>다음 확정 근무</Text><Text style={s.statusTitle}>메가MGC커피 강남역점</Text><Text style={s.statusMeta}>오늘 18:00–22:00 · 4시간</Text></View><Pressable style={s.statusButton}><Text style={s.statusButtonText}>출근 준비</Text></Pressable></View>
   <View style={s.sectionHeader}><Text style={s.sectionTitle}>추천 긴급 공고</Text><Text style={s.more}>전체보기</Text></View><WorkerJobs/>
   <Text style={[s.sectionTitle,{marginTop:30}]}>내 경력 현황</Text><Insight number="12" title="인증 근무 12회" copy="평점 4.9 · 노쇼 없이 성실하게 근무했어요"/>
@@ -65,7 +65,6 @@ function WorkerHome(){return <>
 function JobsScreen(){
   const [mode,setMode]=useState<'map'|'keyword'>('map');
   return <>
-    <ScreenHeader eyebrow="내 경력과 가까운 곳부터" title="긴급 공고 찾기"/>
     <View style={s.searchMode}>
       <Pressable onPress={()=>setMode('map')} style={[s.modeButton,mode==='map'&&s.modeActive]}><MapPinned size={15} color={mode==='map'?colors.ink:colors.muted}/><Text style={[s.modeText,mode==='map'&&s.modeTextActive]}>지도 기반</Text></Pressable>
       <Pressable onPress={()=>setMode('keyword')} style={[s.modeButton,mode==='keyword'&&s.modeActive]}><Search size={15} color={mode==='keyword'?colors.ink:colors.muted}/><Text style={[s.modeText,mode==='keyword'&&s.modeTextActive]}>키워드 검색</Text></Pressable>
@@ -103,7 +102,6 @@ function ScheduleScreen(){
   const selectedKey=`${selected.year}-${selected.month}-${selected.day}`;const records=SHIFT_RECORDS[selectedKey]??[];
   const openCalendar=()=>{setDraft(selected);setViewYear(selected.year);setViewMonth(selected.month);setCalendarOpen(true)};
   return <>
-  <ScreenHeader eyebrow={`${selected.year}년 ${selected.month}월`} title="근무일정"/>
   <View style={s.scheduleCalendarCard}><Pressable onPress={openCalendar} style={s.calendarOpenButton}><View style={s.calendarOpenIcon}><CalendarDays size={18} color={colors.primary}/></View><View style={{flex:1}}><Text style={s.calendarOpenTitle}>캘린더 전체보기</Text></View><ChevronRight size={20} color="#858B97"/></Pressable><View style={s.calendarCardDivider}/><View style={s.weekRow}>{week.map(d=>{const active=d.key===selectedKey;const work=WORK_DAYS.has(d.key);const done=DONE_DAYS.has(d.key);return <Pressable onPress={()=>setSelected({year:d.year,month:d.month,day:d.day})} key={d.key} style={[s.day,active&&s.dayActive]}><Text style={[s.dayName,active&&s.dayTextActive]}>{d.label}</Text><Text style={[s.dayNumber,active&&s.dayTextActive]}>{d.day}</Text>{work||done?<View style={[s.scheduleDot,done&&s.doneDot,active&&s.activeDot]}/>:<View style={s.dotSpacer}/>}</Pressable>})}</View></View>
   <Text style={[s.sectionTitle,{marginTop:28}]}>{selected.month}월 {selected.day}일 근무기록{records.length>1?` · ${records.length}건`:''}</Text>
   {records.length?<View style={s.recordList}>{records.map(record=><View key={`${record.brand}-${record.store}-${record.time}`} style={s.selectedRecord}><View style={s.recordTop}><View style={[s.recordStatus,record.status==='완료'&&s.recordStatusDone]}><Text style={[s.recordStatusText,record.status==='완료'&&s.recordStatusDoneText]}>{record.status}</Text></View><Text style={s.recordTime}>{record.time}</Text></View><Text style={s.recordStore}>{record.brand} {record.store}</Text><Text style={s.recordRole}>{record.role}</Text><View style={s.recordPayRow}><Text style={s.recordPayLabel}>{record.status==='완료'?'받은 시급':'예정 시급'}</Text><Text style={s.recordPay}>{record.wage}</Text></View></View>)}</View>:<View style={s.noRecord}><CalendarDays size={24} color="#858B97"/><Text style={s.noRecordTitle}>근무 기록이 없어요</Text><Text style={s.noRecordCopy}>다른 날짜를 선택해 확인해 보세요.</Text></View>}
@@ -123,7 +121,6 @@ function CalendarModal({visible,year,month,selected,onClose,onConfirm,onYearChan
 }
 
 function ChatScreen(){return <>
-  <ScreenHeader eyebrow="매칭된 매장과 대화해요" title="채팅"/>
   <View style={s.chatNotice}><AlertCircle size={20} color="#9B7420"/><Text style={s.chatNoticeText}>개인정보와 외부 연락처 공유에 주의해주세요.</Text></View>
   <View style={s.chatList}>{[
     ['메','메가MGC커피 강남역점','네, 검정 바지 착용하고 와주세요!','오후 2:18','2'],
@@ -132,7 +129,6 @@ function ChatScreen(){return <>
 </>}
 
 function MyScreen(){return <>
-  <ScreenHeader eyebrow="내 정보와 경력을 관리해요" title="마이"/>
   <View style={s.profileCard}><View style={s.profileAvatar}><Image source={require('../../../assets/profile-knight.png')} style={s.profileImage} resizeMode="cover"/></View><View style={{flex:1}}><Text style={s.profileName}>김용병</Text><Text style={s.profileMeta}>경력 인증 완료 · 평점 4.9</Text></View><ChevronRight size={24} color="#858B97"/></View>
   <View style={s.stats}><View style={s.stat}><Text style={s.statNumber}>12</Text><Text style={s.statLabel}>근무 완료</Text></View><View style={s.statLine}/><View style={s.stat}><Text style={s.statNumber}>48h</Text><Text style={s.statLabel}>누적 시간</Text></View><View style={s.statLine}/><View style={s.stat}><Text style={s.statNumber}>4.9</Text><Text style={s.statLabel}>평점</Text></View></View>
   <Text style={[s.sectionTitle,{marginTop:30}]}>내 정보</Text><View style={s.menuList}>{['브랜드 경력 인증','정산 계좌 관리','알림 설정','고객센터'].map(item=><Pressable key={item} style={s.menuRow}><Text style={s.menuText}>{item}</Text><ChevronRight size={22} color="#858B97"/></Pressable>)}</View>
@@ -149,7 +145,6 @@ function OwnerScreen({tab,setTab}:{tab:TabKey;setTab:(tab:TabKey)=>void}){
 }
 
 function OwnerHome({setTab,quickShift,setQuickShift}:{setTab:(tab:TabKey)=>void;quickShift:QuickShift;setQuickShift:(shift:QuickShift)=>void}){const [quickOpen,setQuickOpen]=useState(false);return <>
-  <ScreenHeader eyebrow="강남역점 점주님, 안녕하세요" title="오늘 매장 운영은 괜찮나요?"/>
   <View style={s.statusCard}><View><Text style={s.statusEyebrow}>등록 중인 긴급 공고</Text><Text style={s.statusTitle}>오늘 저녁 마감 · 1명</Text><Text style={s.statusMeta}>18:00–22:00 · 지원자 3명</Text></View><Pressable onPress={()=>setTab('work')} style={s.statusButton}><Text style={s.statusButtonText}>지원자 보기</Text></Pressable></View>
   <View style={s.sectionHeader}><Text style={s.sectionTitle}>빠른 구인</Text></View><OwnerQuick selected={quickShift} onChange={setQuickShift} onRegister={()=>setQuickOpen(true)}/><Text style={[s.sectionTitle,{marginTop:30}]}>최근 매칭 현황</Text><Insight number="3" title="이번 달 매칭 3건" copy="평균 8분 안에 근로자를 찾았어요"/>
   <QuickRecruitModal visible={quickOpen} shift={quickShift} onClose={()=>setQuickOpen(false)}/>
@@ -170,7 +165,6 @@ function RecruitScreen({initialShift}:{initialShift:QuickShift}){
   const applyCustomTime=()=>{if(/^([01]\d|2[0-3]):[0-5]\d$/.test(customStart)&&/^([01]\d|2[0-3]):[0-5]\d$/.test(customEnd)){setWorkTime(`${customStart}–${customEnd}`);setPosted(false)}};
   const setTemplate=(value:keyof typeof times)=>setWorkTime(times[value]);
   return <>
-    <ScreenHeader eyebrow="필요한 시간만 빠르게" title="긴급 구인 등록"/>
     <Text style={[s.sectionTitle,{marginTop:28}]}>급구유형 선택</Text>
     <View style={s.recruitTemplates}>{[[Clock3,'타임','한 타임만'],[CalendarDays,'당일','하루만'],[CalendarRange,'기간','단기 급구']].map(([Icon,label,description])=>{const value=label as '타임'|'당일'|'기간';const active=recruitType===value;return <Pressable key={label as string} onPress={()=>{setRecruitType(value);setPosted(false);if(value==='타임'){setWorkDate('오늘 · 11월 19일');setWorkTime(times[initialShift])}else if(value==='당일'){setWorkDate('오늘 · 11월 19일');setWorkTime('09:00–18:00')}else{setWorkTime('09:00–18:00')}}} style={[s.recruitTypeCard,active&&s.recruitTemplateActive]}><Icon size={22} color={active?'#fff':colors.ink}/><Text style={[s.recruitTypeText,active&&s.recruitTemplateTextActive]}>{label as string}</Text><Text style={[s.recruitTypeDescription,active&&s.recruitTypeDescriptionActive]}>({description as string})</Text></Pressable>})}</View>
     <View style={s.formCard}>
@@ -217,7 +211,6 @@ function OwnerWorkScreen(){
   const monthlyRecords={ '2026-09':{items:septemberDone,details:septemberDetails},'2026-10':{items:octoberDone,details:octoberDetails},'2026-11':{items:done,details:completedDetails}};const monthLabels={'2026-09':'2026년 9월','2026-10':'2026년 10월','2026-11':'2026년 11월'};const selectedMonthRecords=monthlyRecords[selectedMonth];
   const filteredDone=doneFilter==='month'?selectedMonthRecords.items:done.slice(0,doneFilter==='day'?1:2);const filteredDetails=doneFilter==='month'?selectedMonthRecords.details:completedDetails;const items=mode==='active'?active:filteredDone;
   return <>
-    <ScreenHeader eyebrow="지원자부터 정산까지 한 번에" title="근무관리"/>
     <View style={s.ownerSegment}><Pressable onPress={()=>setMode('active')} style={[s.ownerSegmentButton,mode==='active'&&s.ownerSegmentActive]}><Text style={[s.ownerSegmentText,mode==='active'&&s.ownerSegmentTextActive]}>진행 중 2</Text></Pressable><Pressable onPress={()=>setMode('done')} style={[s.ownerSegmentButton,mode==='done'&&s.ownerSegmentActive]}><Text style={[s.ownerSegmentText,mode==='done'&&s.ownerSegmentTextActive]}>완료 {filteredDone.length}</Text></Pressable></View>
     {mode==='done'?<View style={s.doneFilters}>{[['day','당일'],['week','일주일'],['month','월']].map(([key,label])=><Pressable key={key} onPress={()=>setDoneFilter(key as 'day'|'week'|'month')} style={[s.doneFilter,doneFilter===key&&s.doneFilterActive]}><Text style={[s.doneFilterText,doneFilter===key&&s.doneFilterTextActive]}>{label}</Text></Pressable>)}</View>:null}
     {mode==='done'&&doneFilter==='month'?<Pressable onPress={()=>setMonthPickerOpen(true)} style={s.monthSelector}><View><Text style={s.monthSelectorLabel}>조회 월</Text><Text style={s.monthSelectorValue}>{monthLabels[selectedMonth]}</Text></View><ChevronRight size={21} color={colors.primary}/></Pressable>:null}
@@ -229,13 +222,11 @@ function OwnerWorkScreen(){
 }
 
 function OwnerChatScreen(){const [selected,setSelected]=useState('');const chats=[['김','김용병','네, 검정 바지 착용하고 가겠습니다!','오후 2:18','2'],['박','박카페','내일 10분 전에 도착할게요.','어제','']];return <>
-  <ScreenHeader eyebrow="매칭된 근로자와 대화해요" title="채팅"/>
   <View style={s.chatNotice}><AlertCircle size={20} color="#9B7420"/><Text style={s.chatNoticeText}>근무 변경 사항은 채팅으로 미리 알려주세요.</Text></View>
   <View style={s.chatList}>{chats.map(chat=><Pressable onPress={()=>setSelected(chat[1])} key={chat[1]} style={[s.chatRow,selected===chat[1]&&s.chatRowSelected]}><View style={s.ownerChatAvatar}><Text style={s.ownerChatInitial}>{chat[0]}</Text></View><View style={s.chatCopy}><Text style={s.chatName}>{chat[1]}</Text><Text numberOfLines={1} style={s.chatMessage}>{selected===chat[1]?'대화를 선택했어요 · '+chat[2]:chat[2]}</Text></View><View style={s.chatSide}><Text style={s.chatTime}>{chat[3]}</Text>{chat[4]&&selected!==chat[1]?<View style={s.unread}><Text style={s.unreadText}>{chat[4]}</Text></View>:null}</View></Pressable>)}</View>
 </>}
 
 function OwnerMyScreen(){return <>
-  <ScreenHeader eyebrow="매장과 점주 정보를 관리해요" title="마이"/>
   <View style={s.profileCard}><View style={s.profileAvatar}><Image source={require('../../../assets/profile-knight.png')} style={s.profileImage} resizeMode="cover"/></View><View style={{flex:1}}><Text style={s.profileName}>김점주</Text><Text style={s.profileMeta}>커피 매장 2곳 운영 · 점주 인증</Text></View><ChevronRight size={24} color="#858B97"/></View>
   <View style={s.stats}><View style={s.stat}><Text style={s.statNumber}>2</Text><Text style={s.statLabel}>운영 매장</Text></View><View style={s.statLine}/><View style={s.stat}><Text style={s.statNumber}>8</Text><Text style={s.statLabel}>매칭 완료</Text></View><View style={s.statLine}/><View style={s.stat}><Text style={s.statNumber}>4.8</Text><Text style={s.statLabel}>매장 평점</Text></View></View>
   <Text style={[s.sectionTitle,{marginTop:30}]}>매장 관리</Text><View style={s.menuList}>{['매장 정보 관리','정산 내역','알림 설정','고객센터'].map(item=><Pressable key={item} style={s.menuRow}><Text style={s.menuText}>{item}</Text><ChevronRight size={22} color="#858B97"/></Pressable>)}</View>
@@ -251,7 +242,7 @@ function WorkerJobs(){return <JobList data={jobs.slice(0,2)}/>}
 function OwnerQuick({selected,onChange,onRegister}:{selected:QuickShift;onChange:(shift:QuickShift)=>void;onRegister:()=>void}){return <View style={s.quickArea}><View style={s.quickChoiceRow}>{[[Sunrise,'오픈'],[Coffee,'피크타임'],[Moon,'마감']].map(([Icon,label])=>{const active=selected===label;return <Pressable onPress={()=>onChange(label as QuickShift)} key={label as string} style={[s.quickChoice,active&&s.quickChoiceActive]}><Icon size={24} color={active?'#fff':colors.ink}/><Text style={[s.quickChoiceText,active&&s.quickChoiceTextActive]}>{label as string}</Text></Pressable>})}</View><Pressable onPress={onRegister} style={s.quickRegisterButton}><Text style={s.quickRegisterText}>등록하기</Text><ChevronRight size={22} color={colors.primary}/></Pressable></View>}
 
 const s=StyleSheet.create({
-  screen:{flex:1,width:'100%',maxWidth:430,alignSelf:'center',backgroundColor:colors.background},content:{padding:24,paddingBottom:120},header:{flexDirection:'row',justifyContent:'space-between',alignItems:'center',marginTop:8},hello:{color:colors.muted,fontSize:13,fontWeight:'700'},heading:{color:colors.ink,fontSize:24,fontWeight:'800',marginTop:6,letterSpacing:-.5},bell:{width:42,height:42,borderRadius:15,backgroundColor:colors.surface,alignItems:'center',justifyContent:'center'},bellText:{color:colors.ink,fontSize:19,fontWeight:'900'},
+  screen:{flex:1,width:'100%',maxWidth:430,alignSelf:'center',backgroundColor:colors.background},content:{padding:24,paddingBottom:120},header:{flexDirection:'row',justifyContent:'space-between',alignItems:'center',marginTop:8,marginBottom:26},headerCopy:{flex:1},brandRow:{flexDirection:'row',alignItems:'center',gap:9},appName:{color:colors.ink,fontSize:24,fontWeight:'800',letterSpacing:-.7},headerTabBadge:{height:25,paddingHorizontal:10,borderRadius:9,backgroundColor:colors.primarySoft,alignItems:'center',justifyContent:'center'},headerTabText:{color:colors.primary,fontSize:11,fontWeight:'800'},appSlogan:{color:colors.muted,fontSize:12,fontWeight:'600',marginTop:6},bell:{width:42,height:42,borderRadius:15,backgroundColor:colors.surface,alignItems:'center',justifyContent:'center',position:'relative'},notificationDot:{position:'absolute',top:9,right:9,width:7,height:7,borderRadius:4,backgroundColor:colors.primary,borderWidth:1.5,borderColor:colors.surface},
   statusCard:{backgroundColor:colors.ink,borderRadius:24,padding:22,marginTop:28},statusEyebrow:{color:'#AAB6B1',fontSize:12,fontWeight:'800'},statusTitle:{color:'#fff',fontSize:19,fontWeight:'900',marginTop:9},statusMeta:{color:'#C7CFCC',fontSize:13,marginTop:6},statusButton:{backgroundColor:colors.primary,borderRadius:13,paddingVertical:12,alignItems:'center',marginTop:20},statusButtonText:{color:'#fff',fontWeight:'900'},
   sectionHeader:{flexDirection:'row',justifyContent:'space-between',alignItems:'center',marginTop:30,marginBottom:14},sectionTitle:{color:colors.ink,fontSize:18,fontWeight:'900'},more:{color:colors.muted,fontSize:12,fontWeight:'700'},cards:{gap:12},jobCard:{flexDirection:'row',alignItems:'center',padding:17,backgroundColor:colors.surface,borderRadius:20,gap:14},brandLogo:{width:48,height:48,borderRadius:15,backgroundColor:colors.warning,alignItems:'center',justifyContent:'center'},brandLogoText:{fontSize:17,fontWeight:'900',color:colors.ink},jobTitleRow:{flexDirection:'row',alignItems:'center',gap:6},jobTitle:{color:colors.ink,fontSize:15,fontWeight:'900',flexShrink:1},jobTime:{color:colors.muted,fontSize:12,marginTop:5},jobBottom:{flexDirection:'row',justifyContent:'space-between',alignItems:'center',marginTop:13},pay:{color:colors.primary,fontSize:13,fontWeight:'900'},badge:{color:colors.muted,fontSize:10,backgroundColor:colors.background,paddingHorizontal:8,paddingVertical:5,borderRadius:8},matchBadge:{color:colors.green,backgroundColor:colors.greenSoft},matchMini:{fontSize:9,color:colors.green,backgroundColor:colors.greenSoft,paddingHorizontal:6,paddingVertical:4,borderRadius:6,fontWeight:'800'},cardChevron:{fontSize:24,color:'#858B97'},
   quickCard:{backgroundColor:colors.surface,borderRadius:22,overflow:'hidden'},quickOptions:{flexDirection:'row',paddingVertical:20},quickOption:{flex:1,alignItems:'center',position:'relative'},quickIcon:{width:42,height:42,borderRadius:14,backgroundColor:colors.background,alignItems:'center',justifyContent:'center'},quickText:{color:colors.ink,fontSize:13,fontWeight:'900',marginTop:9},quickDivider:{position:'absolute',right:0,top:7,width:1,height:52,backgroundColor:colors.line},quickFooter:{borderTopWidth:1,borderTopColor:colors.line,padding:16,flexDirection:'row',alignItems:'center',justifyContent:'space-between'},quickFooterTitle:{fontSize:13,color:colors.ink,fontWeight:'900'},quickFooterCopy:{fontSize:10,color:colors.muted,marginTop:4},insightCard:{backgroundColor:colors.surface,borderRadius:20,padding:18,marginTop:14,flexDirection:'row',alignItems:'center',gap:14},insightIcon:{width:48,height:48,borderRadius:16,backgroundColor:colors.greenSoft,alignItems:'center',justifyContent:'center'},insightIconText:{color:colors.green,fontWeight:'900',fontSize:18},insightTitle:{color:colors.ink,fontSize:14,fontWeight:'900'},insightCopy:{color:colors.muted,fontSize:11,lineHeight:17,marginTop:5},
