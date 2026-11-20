@@ -67,13 +67,14 @@ function WorkerHome({onProfile}:{onProfile:()=>void}){return <>
 </>}
 
 function JobsScreen(){
-  const [mode,setMode]=useState<'map'|'keyword'>('map');
+  const [mode,setMode]=useState<'map'|'keyword'>('map');const [mapQuery,setMapQuery]=useState('');
+  const mapResultCount=useMemo(()=>{const keyword=mapQuery.trim().toLowerCase();return jobs.filter(job=>!keyword||`${job.brand} ${job.store} ${job.area} ${job.address}`.toLowerCase().includes(keyword)).length},[mapQuery]);
   const modeMenu=<View style={s.searchMode}>
       <Pressable onPress={()=>setMode('map')} style={[s.modeButton,mode==='map'&&s.modeActive]}><MapPinned size={15} color={mode==='map'?colors.ink:colors.muted}/><Text style={[s.modeText,mode==='map'&&s.modeTextActive]}>지도 기반</Text></Pressable>
       <Pressable onPress={()=>setMode('keyword')} style={[s.modeButton,mode==='keyword'&&s.modeActive]}><Search size={15} color={mode==='keyword'?colors.ink:colors.muted}/><Text style={[s.modeText,mode==='keyword'&&s.modeTextActive]}>키워드 검색</Text></Pressable>
     </View>;
   if(mode==='keyword')return <KeywordJobs modeMenu={modeMenu}/>;
-  return <ScrollView style={s.jobsScroll} contentContainerStyle={s.jobsScrollContent} showsVerticalScrollIndicator={false}>{modeMenu}<MapJobs/></ScrollView>;
+  return <View style={s.keywordLayout}><View style={s.searchBox}><Search size={20} color={colors.ink}/><TextInput value={mapQuery} onChangeText={setMapQuery} placeholder="지역·커피 브랜드 검색" placeholderTextColor="#858B97" style={s.searchInput} returnKeyType="search" autoCapitalize="none"/><Text style={s.searchCount}>{mapResultCount}</Text></View><ScrollView style={s.keywordScroll} contentContainerStyle={s.keywordScrollContent} showsVerticalScrollIndicator={false}><View style={s.searchModeScrollable}>{modeMenu}</View><MapJobs query={mapQuery}/></ScrollView></View>;
 }
 
 function KeywordJobs({modeMenu}:{modeMenu:React.ReactNode}){
@@ -89,7 +90,7 @@ function KeywordJobs({modeMenu}:{modeMenu:React.ReactNode}){
   </View>;
 }
 
-function MapJobs(){const [today,setToday]=useState(false);const [matched,setMatched]=useState(false);const [selectedId,setSelectedId]=useState(jobs[0].id);const available=jobs.filter(job=>(!today||job.isToday)&&(!matched||job.matched));const selected=available.find(job=>job.id===selectedId)??available[0];const markers=available.map(job=>({...JOB_COORDINATES[job.id],id:job.id,label:`${job.brand} ${job.store}`}));return <>
+function MapJobs({query}:{query:string}){const [today,setToday]=useState(false);const [matched,setMatched]=useState(false);const [selectedId,setSelectedId]=useState(jobs[0].id);const keyword=query.trim().toLowerCase();const available=jobs.filter(job=>(!keyword||`${job.brand} ${job.store} ${job.area} ${job.address}`.toLowerCase().includes(keyword))&&(!today||job.isToday)&&(!matched||job.matched));const selected=available.find(job=>job.id===selectedId)??available[0];const markers=available.map(job=>({...JOB_COORDINATES[job.id],id:job.id,label:`${job.brand} ${job.store}`}));return <>
   <View style={s.mapFilters}><FilterButton label="오늘" active={today} onPress={()=>setToday(value=>!value)}/><FilterButton label="경력 일치" active={matched} onPress={()=>setMatched(value=>!value)}/><View style={{flex:1}}/><Pressable style={s.locationButton}><Crosshair size={13} color={colors.ink}/><Text style={s.locationText}>현 위치</Text></Pressable></View>
   <View style={s.map}>
     <NaverMap markers={markers} onSelect={setSelectedId}/>
