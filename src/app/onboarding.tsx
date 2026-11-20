@@ -24,7 +24,7 @@ export default function OnboardingScreen(){
       <Text style={s.sectionTitle}>{role==='worker'?'일해본 커피 브랜드':'운영 중인 커피 브랜드'}</Text><Text style={s.helper}>{role==='worker'?'1개 이상 선택 · 복수 선택 가능':'카페 매장 등록은 다음 단계에서 진행해요.'}</Text>
       <View style={s.brandGrid}>{['메가MGC커피','컴포즈커피','빽다방','이디야커피','투썸플레이스','더벤티'].map(item=>{const selected=brands.includes(item);return <Pressable key={item} onPress={()=>selectBrand(item)} style={[s.brand,selected&&s.brandSelected]}><View style={s.brandMark}/><Text style={[s.brandText,selected&&s.brandTextSelected]} numberOfLines={1}>{item}</Text></Pressable>})}</View>
     </ScrollView>
-    <View style={s.footer}><Pressable style={s.button} onPress={()=>router.replace({pathname:'/dashboard/[role]',params:{role}})}><Text style={s.buttonText}>다음</Text></Pressable></View>
+    <View style={s.footer}><Pressable style={s.button} onPress={()=>router.replace({pathname:'/dashboard/[role]',params:{role,brands:brands.join(',')}})}><Text style={s.buttonText}>다음</Text></Pressable></View>
   </SafeAreaView>;
 }
 

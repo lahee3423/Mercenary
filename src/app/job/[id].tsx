@@ -6,13 +6,13 @@ import { formatPay, jobs } from '../../data/jobs';
 import { colors } from '../../theme';
 
 export default function JobDetailScreen(){
-  const {id}=useLocalSearchParams<{id:string}>(); const job=jobs.find(item=>item.id===id);
+  const {id,brands}=useLocalSearchParams<{id:string;brands?:string}>(); const job=jobs.find(item=>item.id===id);const experienceBrands=brands?.split(',').filter(Boolean);const matched=job?(experienceBrands?experienceBrands.includes(job.brand):job.matched):false;
   if(!job)return <SafeAreaView style={s.screen}><View style={s.missing}><Text style={s.missingTitle}>공고를 찾을 수 없어요</Text><Pressable onPress={()=>router.back()}><Text style={s.backLink}>돌아가기</Text></Pressable></View></SafeAreaView>;
   return <SafeAreaView style={s.screen} edges={['top','bottom']}>
     <View style={s.header}><Pressable onPress={()=>router.back()} style={s.backButton}><ChevronLeft size={24} color={colors.ink}/></Pressable><Text style={s.headerTitle}>공고 상세</Text><Pressable style={s.saveButton}><Heart size={21} color={colors.ink}/></Pressable></View>
     <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
       <View style={s.brandRow}><View style={s.brandLogo}><Text style={s.brandInitial}>{job.brand.slice(0,1)}</Text></View><View><Text style={s.brand}>{job.brand}</Text><Text style={s.store}>{job.store}</Text></View></View>
-      <View style={s.badges}>{job.matched&&<View style={s.matchBadge}><Text style={s.matchText}>내 경력과 일치</Text></View>}<View style={s.urgentBadge}><Text style={s.urgentText}>{job.isToday?'오늘 긴급':'모집 중'}</Text></View></View>
+      <View style={s.badges}>{matched&&<View style={s.matchBadge}><Text style={s.matchText}>내 경력과 일치</Text></View>}<View style={s.urgentBadge}><Text style={s.urgentText}>{job.isToday?'오늘 긴급':'모집 중'}</Text></View></View>
       <Text style={s.title}>{job.dateLabel} {job.time}{`\n`}{job.role} 용병을 구해요</Text>
       <View style={s.summary}>
         <Summary label="근무 일시" value={`${job.dateLabel} ${job.time}`}/><Summary label="급여" value={formatPay(job.hourlyPay)} highlight/><Summary label="예상 시간" value={`${job.time.split('–')[0]}부터`}/>

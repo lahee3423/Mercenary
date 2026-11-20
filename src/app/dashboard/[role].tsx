@@ -39,63 +39,64 @@ const SHIFT_RECORDS:Record<string,ShiftRecord[]>={
 };
 
 export default function DashboardScreen(){
-  const {role}=useLocalSearchParams<{role:string}>(); const owner=role==='owner'; const [tab,setTab]=useState<TabKey>('home');
+  const {role,brands}=useLocalSearchParams<{role:string;brands?:string}>(); const owner=role==='owner'; const [tab,setTab]=useState<TabKey>('home');
+  const experienceBrands=useMemo(()=>brands?.split(',').filter(Boolean)??['메가MGC커피','컴포즈커피'],[brands]);
   const navigationTabs=owner?ownerTabs:workerTabs;const workerJobs=!owner&&tab==='jobs';const activeIcon=(navigationTabs.find(item=>item.key===tab)?.icon??'home') as keyof typeof tabIcons;const slogan=owner?'오늘의 지원군을 소환하세요.':'오늘의 임무, 수락하시겠습니까?';
   return <SafeAreaView style={s.screen} edges={['top','bottom']}>
-    {workerJobs?<View style={s.fixedJobsContent}><AppHeader tabIcon={activeIcon} slogan={slogan}/><JobsScreen/></View>:<ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}><AppHeader tabIcon={activeIcon} slogan={slogan}/>{owner?<OwnerScreen tab={tab} setTab={setTab}/>:<WorkerScreen tab={tab} setTab={setTab}/>}</ScrollView>}
+    {workerJobs?<View style={s.fixedJobsContent}><AppHeader tabIcon={activeIcon} slogan={slogan}/><JobsScreen experienceBrands={experienceBrands}/></View>:<ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}><AppHeader tabIcon={activeIcon} slogan={slogan}/>{owner?<OwnerScreen tab={tab} setTab={setTab}/>:<WorkerScreen tab={tab} setTab={setTab} experienceBrands={experienceBrands}/>}</ScrollView>}
     <View style={s.tabBar}>{navigationTabs.map(item=>{const Icon=tabIcons[item.icon as keyof typeof tabIcons];const active=tab===item.key;return <Pressable key={item.key} onPress={()=>setTab(item.key)} style={s.tab}><Icon size={19} color={active?colors.primary:'#858B97'} strokeWidth={2}/><Text style={[s.tabLabel,active&&s.tabActive]}>{item.label}</Text></Pressable>})}</View>
   </SafeAreaView>;
 }
 
-function WorkerScreen({tab,setTab}:{tab:TabKey;setTab:(tab:TabKey)=>void}){
-  if(tab==='jobs') return <JobsScreen/>;
+function WorkerScreen({tab,setTab,experienceBrands}:{tab:TabKey;setTab:(tab:TabKey)=>void;experienceBrands:string[]}){
+  if(tab==='jobs') return <JobsScreen experienceBrands={experienceBrands}/>;
   if(tab==='work') return <ScheduleScreen/>;
   if(tab==='chat') return <ChatScreen/>;
-  if(tab==='my') return <MyScreen/>;
-  return <WorkerHome onProfile={()=>setTab('my')}/>;
+  if(tab==='my') return <MyScreen experienceBrands={experienceBrands}/>;
+  return <WorkerHome onProfile={()=>setTab('my')} experienceBrands={experienceBrands}/>;
 }
 
 function AppHeader({tabIcon,slogan}:{tabIcon:keyof typeof tabIcons;slogan:string}){const TabIcon=tabIcons[tabIcon];return <View style={s.header}><View style={s.headerCopy}><View style={s.brandRow}><Text style={s.appName}>용⚔️병</Text><View style={s.headerTabBadge}><TabIcon size={15} color={colors.primary} strokeWidth={2.3}/></View></View><Text style={s.appSlogan}>{slogan}</Text></View><Pressable style={s.bell}><Bell size={19} color={colors.ink} strokeWidth={2}/><View style={s.notificationDot}/></Pressable></View>}
 
-function WorkerHome({onProfile}:{onProfile:()=>void}){return <>
+function WorkerHome({onProfile,experienceBrands}:{onProfile:()=>void;experienceBrands:string[]}){return <>
   <View style={s.statusCard}><View><Text style={s.statusEyebrow}>다음 확정 근무</Text><Text style={s.statusTitle}>메가MGC커피 강남역점</Text><Text style={s.statusMeta}>오늘 18:00–22:00 · 4시간</Text></View><Pressable style={s.statusButton}><Text style={s.statusButtonText}>출근 준비</Text></Pressable></View>
-  <View style={s.sectionHeader}><Text style={s.sectionTitle}>추천 긴급 공고</Text><Text style={s.more}>전체보기</Text></View><WorkerJobs/>
+  <View style={s.sectionHeader}><Text style={s.sectionTitle}>추천 긴급 공고</Text><Text style={s.more}>전체보기</Text></View><WorkerJobs experienceBrands={experienceBrands}/>
   <Text style={[s.sectionTitle,{marginTop:30}]}>이번 달 용병 활동</Text>
   <View style={s.workerActivityCard}><View style={s.workerActivityItem}><View style={s.workerActivityIcon}><Banknote size={20} color={colors.primary}/></View><Text style={s.workerActivityLabel}>이번 달 수익</Text><Text style={s.workerActivityValue}>780,000원</Text></View><View style={s.workerActivityDivider}/><View style={s.workerActivityItem}><View style={s.workerActivityIcon}><CheckCircle2 size={20} color={colors.primary}/></View><Text style={s.workerActivityLabel}>완료한 임무</Text><Text style={s.workerActivityValue}>12건</Text></View></View>
   <Text style={[s.sectionTitle,{marginTop:30}]}>내 용병 프로필</Text>
-  <Pressable onPress={onProfile} style={s.workerProfileCard}><View style={s.workerProfileAvatar}><Image source={require('../../../assets/profile-knight.png')} style={s.profileImage} resizeMode="cover"/></View><View style={{flex:1}}><View style={s.workerProfileNameRow}><Text style={s.profileName}>김용병</Text><View style={s.verifiedBadge}><Check size={10} color={colors.green}/><Text style={s.verifiedText}>경력 인증</Text></View></View><Text style={s.profileMeta}>카페 경력 2년 4개월 · 평점 4.9</Text><Text style={s.workerProfileCareer}>메가MGC커피 · 컴포즈커피 경험</Text></View><ChevronRight size={22} color={colors.muted}/></Pressable>
+  <Pressable onPress={onProfile} style={s.workerProfileCard}><View style={s.workerProfileAvatar}><Image source={require('../../../assets/profile-knight.png')} style={s.profileImage} resizeMode="cover"/></View><View style={{flex:1}}><View style={s.workerProfileNameRow}><Text style={s.profileName}>김용병</Text><View style={s.verifiedBadge}><Check size={10} color={colors.green}/><Text style={s.verifiedText}>경력 인증</Text></View></View><Text style={s.profileMeta}>카페 경력 2년 4개월 · 평점 4.9</Text><Text style={s.workerProfileCareer}>{experienceBrands.join(' · ')} 경험</Text></View><ChevronRight size={22} color={colors.muted}/></Pressable>
 </>}
 
-function JobsScreen(){
+function JobsScreen({experienceBrands}:{experienceBrands:string[]}){
   const [mode,setMode]=useState<'map'|'keyword'>('map');const [mapQuery,setMapQuery]=useState('');
   const mapResultCount=useMemo(()=>{const keyword=mapQuery.trim().toLowerCase();return jobs.filter(job=>!keyword||`${job.brand} ${job.store} ${job.area} ${job.address}`.toLowerCase().includes(keyword)).length},[mapQuery]);
   const modeMenu=<View style={s.searchMode}>
       <Pressable onPress={()=>setMode('map')} style={[s.modeButton,mode==='map'&&s.modeActive]}><MapPinned size={15} color={mode==='map'?colors.ink:colors.muted}/><Text style={[s.modeText,mode==='map'&&s.modeTextActive]}>지도 기반</Text></Pressable>
       <Pressable onPress={()=>setMode('keyword')} style={[s.modeButton,mode==='keyword'&&s.modeActive]}><Search size={15} color={mode==='keyword'?colors.ink:colors.muted}/><Text style={[s.modeText,mode==='keyword'&&s.modeTextActive]}>키워드 검색</Text></Pressable>
     </View>;
-  if(mode==='keyword')return <KeywordJobs modeMenu={modeMenu}/>;
-  return <View style={s.keywordLayout}><View style={s.searchBox}><Search size={20} color={colors.ink}/><TextInput value={mapQuery} onChangeText={setMapQuery} placeholder="지역·커피 브랜드 검색" placeholderTextColor="#858B97" style={s.searchInput} returnKeyType="search" autoCapitalize="none"/><Text style={s.searchCount}>{mapResultCount}</Text></View><ScrollView style={s.keywordScroll} contentContainerStyle={s.keywordScrollContent} showsVerticalScrollIndicator={false}><View style={s.searchModeScrollable}>{modeMenu}</View><MapJobs query={mapQuery}/></ScrollView></View>;
+  if(mode==='keyword')return <KeywordJobs modeMenu={modeMenu} experienceBrands={experienceBrands}/>;
+  return <View style={s.keywordLayout}><View style={s.searchBox}><Search size={20} color={colors.ink}/><TextInput value={mapQuery} onChangeText={setMapQuery} placeholder="지역·커피 브랜드 검색" placeholderTextColor="#858B97" style={s.searchInput} returnKeyType="search" autoCapitalize="none"/><Text style={s.searchCount}>{mapResultCount}</Text></View><ScrollView style={s.keywordScroll} contentContainerStyle={s.keywordScrollContent} showsVerticalScrollIndicator={false}><View style={s.searchModeScrollable}>{modeMenu}</View><MapJobs query={mapQuery} experienceBrands={experienceBrands}/></ScrollView></View>;
 }
 
-function KeywordJobs({modeMenu}:{modeMenu:React.ReactNode}){
+function KeywordJobs({modeMenu,experienceBrands}:{modeMenu:React.ReactNode;experienceBrands:string[]}){
   const [query,setQuery]=useState(''); const [today,setToday]=useState(false); const [matched,setMatched]=useState(false); const [distance,setDistance]=useState(false);
-  const results=useMemo(()=>jobs.filter(job=>{const keyword=query.trim().toLowerCase();const searchable=`${job.brand} ${job.store} ${job.area} ${job.address}`.toLowerCase();return (!keyword||searchable.includes(keyword))&&(!today||job.isToday)&&(!matched||job.matched)}).sort((a,b)=>distance?a.distance-b.distance:0),[query,today,matched,distance]);
+  const results=useMemo(()=>jobs.filter(job=>{const keyword=query.trim().toLowerCase();const searchable=`${job.brand} ${job.store} ${job.area} ${job.address}`.toLowerCase();return (!keyword||searchable.includes(keyword))&&(!today||job.isToday)&&(!matched||experienceBrands.includes(job.brand))}).sort((a,b)=>distance?a.distance-b.distance:0),[query,today,matched,distance,experienceBrands]);
   return <View style={s.keywordLayout}>
     <View style={s.searchBox}><Search size={20} color={colors.ink}/><TextInput value={query} onChangeText={setQuery} placeholder="지역·커피 브랜드 검색" placeholderTextColor="#858B97" style={s.searchInput} returnKeyType="search"/><Text style={s.searchCount}>{results.length}</Text></View>
     <ScrollView style={s.keywordScroll} contentContainerStyle={s.keywordScrollContent} showsVerticalScrollIndicator={false}><View style={s.searchModeScrollable}>{modeMenu}</View>
     <View style={s.filters}><FilterButton label="오늘" active={today} onPress={()=>setToday(value=>!value)}/><FilterButton label="경력 일치" active={matched} onPress={()=>setMatched(value=>!value)}/><FilterButton label="거리순" active={distance} onPress={()=>setDistance(value=>!value)}/></View>
     <View style={s.resultHeader}><Text style={s.sectionTitle}>지금 지원 가능</Text><Text style={s.resultCount}>{results.length}개 공고</Text></View>
-    {results.length?<JobList data={results}/>:<View style={s.empty}><Search size={28} color="#858B97"/><Text style={s.emptyTitle}>조건에 맞는 공고가 없어요</Text><Text style={s.emptyCopy}>검색어나 필터를 변경해 보세요.</Text></View>}
+    {results.length?<JobList data={results} experienceBrands={experienceBrands}/>:<View style={s.empty}><Search size={28} color="#858B97"/><Text style={s.emptyTitle}>조건에 맞는 공고가 없어요</Text><Text style={s.emptyCopy}>검색어나 필터를 변경해 보세요.</Text></View>}
     </ScrollView>
   </View>;
 }
 
-function MapJobs({query}:{query:string}){const [today,setToday]=useState(false);const [matched,setMatched]=useState(false);const [selectedId,setSelectedId]=useState(jobs[0].id);const keyword=query.trim().toLowerCase();const available=jobs.filter(job=>(!keyword||`${job.brand} ${job.store} ${job.area} ${job.address}`.toLowerCase().includes(keyword))&&(!today||job.isToday)&&(!matched||job.matched));const selected=available.find(job=>job.id===selectedId)??available[0];const markers=available.map(job=>({...JOB_COORDINATES[job.id],id:job.id,label:`${job.brand} ${job.store}`}));return <>
+function MapJobs({query,experienceBrands}:{query:string;experienceBrands:string[]}){const [today,setToday]=useState(false);const [matched,setMatched]=useState(false);const [selectedId,setSelectedId]=useState(jobs[0].id);const keyword=query.trim().toLowerCase();const available=jobs.filter(job=>(!keyword||`${job.brand} ${job.store} ${job.area} ${job.address}`.toLowerCase().includes(keyword))&&(!today||job.isToday)&&(!matched||experienceBrands.includes(job.brand)));const selected=available.find(job=>job.id===selectedId)??available[0];const markers=available.map(job=>({...JOB_COORDINATES[job.id],id:job.id,label:`${job.brand} ${job.store}`}));return <>
   <View style={s.mapFilters}><FilterButton label="오늘" active={today} onPress={()=>setToday(value=>!value)}/><FilterButton label="경력 일치" active={matched} onPress={()=>setMatched(value=>!value)}/><View style={{flex:1}}/><Pressable style={s.locationButton}><Crosshair size={13} color={colors.ink}/><Text style={s.locationText}>현 위치</Text></Pressable></View>
   <View style={s.map}>
     <NaverMap markers={markers} onSelect={setSelectedId}/>
   </View>
-  {selected&&<View style={s.mapSummary}><View style={s.mapSummaryTop}><Text style={s.mapSummaryLabel}>선택한 지역의 공고</Text><Text style={s.resultCount}>반경 4km · {available.length}개</Text></View><ScrollView style={s.mapJobScroll} nestedScrollEnabled showsVerticalScrollIndicator>{available.map(job=><Pressable onPress={()=>openJob(job.id)} key={job.id} style={[s.mapJob,job.id===selected.id&&s.mapJobSelected]}><View style={s.brandLogo}><Text style={s.brandLogoText}>{job.brand.slice(0,1)}</Text></View><View style={{flex:1}}><View style={s.jobTitleRow}><Text numberOfLines={1} style={s.jobTitle}>{job.brand} {job.store}</Text>{job.id===selected.id?<Text style={s.mapSelectedBadge}>지도 선택</Text>:null}</View><Text style={s.jobTime}>{job.dateLabel} {job.time} · {job.distance}km</Text><Text style={s.pay}>{formatPay(job.hourlyPay)}</Text></View><ChevronRight size={22} color="#858B97"/></Pressable>)}</ScrollView></View>}
+  {selected&&<View style={s.mapSummary}><View style={s.mapSummaryTop}><Text style={s.mapSummaryLabel}>선택한 지역의 공고</Text><Text style={s.resultCount}>반경 4km · {available.length}개</Text></View><ScrollView style={s.mapJobScroll} nestedScrollEnabled showsVerticalScrollIndicator>{available.map(job=><Pressable onPress={()=>openJob(job.id,experienceBrands)} key={job.id} style={[s.mapJob,job.id===selected.id&&s.mapJobSelected]}><View style={s.brandLogo}><Text style={s.brandLogoText}>{job.brand.slice(0,1)}</Text></View><View style={{flex:1}}><View style={s.jobTitleRow}><Text numberOfLines={1} style={s.jobTitle}>{job.brand} {job.store}</Text>{job.id===selected.id?<Text style={s.mapSelectedBadge}>지도 선택</Text>:null}</View><Text style={s.jobTime}>{job.dateLabel} {job.time} · {job.distance}km</Text><Text style={s.pay}>{formatPay(job.hourlyPay)}</Text></View><ChevronRight size={22} color="#858B97"/></Pressable>)}</ScrollView></View>}
 </>}
 
 function ScheduleScreen(){
@@ -131,8 +132,8 @@ function ChatScreen(){return <>
   ].map(chat=><Pressable key={chat[1]} style={s.chatRow}><View style={s.chatAvatar}><Text style={s.brandLogoText}>{chat[0]}</Text></View><View style={s.chatCopy}><Text style={s.chatName}>{chat[1]}</Text><Text numberOfLines={1} style={s.chatMessage}>{chat[2]}</Text></View><View style={s.chatSide}><Text style={s.chatTime}>{chat[3]}</Text>{chat[4]?<View style={s.unread}><Text style={s.unreadText}>{chat[4]}</Text></View>:null}</View></Pressable>)}</View>
 </>}
 
-function MyScreen(){return <>
-  <View style={s.profileCard}><View style={s.profileAvatar}><Image source={require('../../../assets/profile-knight.png')} style={s.profileImage} resizeMode="cover"/></View><View style={{flex:1}}><Text style={s.profileName}>김용병</Text><Text style={s.profileMeta}>경력 인증 완료 · 평점 4.9</Text></View><ChevronRight size={24} color="#858B97"/></View>
+function MyScreen({experienceBrands}:{experienceBrands:string[]}){return <>
+  <View style={s.profileCard}><View style={s.profileAvatar}><Image source={require('../../../assets/profile-knight.png')} style={s.profileImage} resizeMode="cover"/></View><View style={{flex:1}}><Text style={s.profileName}>김용병</Text><Text style={s.profileMeta}>경력 인증 완료 · 평점 4.9</Text><Text style={s.workerProfileCareer}>{experienceBrands.join(' · ')} 경험</Text></View><ChevronRight size={24} color="#858B97"/></View>
   <View style={s.stats}><View style={s.stat}><Text style={s.statNumber}>12</Text><Text style={s.statLabel}>근무 완료</Text></View><View style={s.statLine}/><View style={s.stat}><Text style={s.statNumber}>48h</Text><Text style={s.statLabel}>누적 시간</Text></View><View style={s.statLine}/><View style={s.stat}><Text style={s.statNumber}>4.9</Text><Text style={s.statLabel}>평점</Text></View></View>
   <Text style={[s.sectionTitle,{marginTop:30}]}>내 정보</Text><View style={s.menuList}>{['브랜드 경력 인증','정산 계좌 관리','알림 설정','고객센터'].map(item=><Pressable key={item} style={s.menuRow}><Text style={s.menuText}>{item}</Text><ChevronRight size={22} color="#858B97"/></Pressable>)}</View>
   <Pressable onPress={()=>router.replace('/')} style={s.logoutButton}><Text style={s.logoutText}>로그아웃</Text></Pressable>
@@ -240,9 +241,9 @@ function OwnerMyScreen(){return <>
 </>}
 
 function FilterButton({label,active,onPress}:{label:string;active:boolean;onPress:()=>void}){return <Pressable onPress={onPress} style={[s.filter,active&&s.filterActive]}><Text style={[s.filterText,active&&s.filterTextActive]}>{label}</Text>{active&&<Check size={12} color="#fff" strokeWidth={3}/>}</Pressable>}
-function openJob(id:string){router.push({pathname:'/job/[id]',params:{id}})}
-function JobList({data}:{data:Job[]}){return <View style={s.cards}>{data.map(job=><Pressable onPress={()=>openJob(job.id)} style={s.jobCard} key={job.id}><View style={s.brandLogo}><Text style={s.brandLogoText}>{job.brand.slice(0,1)}</Text></View><View style={{flex:1}}><View style={s.jobTitleRow}><Text numberOfLines={1} style={s.jobTitle}>{job.brand} {job.store}</Text>{job.matched&&<Text style={s.matchMini}>경력 일치</Text>}</View><Text style={s.jobTime}>{job.dateLabel} {job.time} · {job.area}</Text><View style={s.jobBottom}><Text style={s.pay}>{formatPay(job.hourlyPay)}</Text><Text style={s.badge}>{job.distance}km</Text></View></View><ChevronRight size={22} color="#858B97"/></Pressable>)}</View>}
-function WorkerJobs(){return <JobList data={jobs.slice(0,2)}/>}
+function openJob(id:string,experienceBrands:string[]){router.push({pathname:'/job/[id]',params:{id,brands:experienceBrands.join(',')}})}
+function JobList({data,experienceBrands}:{data:Job[];experienceBrands:string[]}){return <View style={s.cards}>{data.map(job=>{const matched=experienceBrands.includes(job.brand);return <Pressable onPress={()=>openJob(job.id,experienceBrands)} style={s.jobCard} key={job.id}><View style={s.brandLogo}><Text style={s.brandLogoText}>{job.brand.slice(0,1)}</Text></View><View style={{flex:1}}><View style={s.jobTitleRow}><Text numberOfLines={1} style={s.jobTitle}>{job.brand} {job.store}</Text>{matched&&<Text style={s.matchMini}>경력 일치</Text>}</View><Text style={s.jobTime}>{job.dateLabel} {job.time} · {job.area}</Text><View style={s.jobBottom}><Text style={s.pay}>{formatPay(job.hourlyPay)}</Text><Text style={s.badge}>{job.distance}km</Text></View></View><ChevronRight size={22} color="#858B97"/></Pressable>})}</View>}
+function WorkerJobs({experienceBrands}:{experienceBrands:string[]}){const recommendations=jobs.filter(job=>experienceBrands.includes(job.brand)).slice(0,2);return <JobList data={recommendations.length?recommendations:jobs.slice(0,2)} experienceBrands={experienceBrands}/>}
 function OwnerQuick({selected,onChange,onRegister}:{selected:QuickShift;onChange:(shift:QuickShift)=>void;onRegister:()=>void}){return <View style={s.quickArea}><View style={s.quickChoiceRow}>{[[Sunrise,'오픈'],[Coffee,'피크타임'],[Moon,'마감']].map(([Icon,label])=>{const active=selected===label;return <Pressable onPress={()=>onChange(label as QuickShift)} key={label as string} style={[s.quickChoice,active&&s.quickChoiceActive]}><Icon size={24} color={active?'#fff':colors.ink}/><Text style={[s.quickChoiceText,active&&s.quickChoiceTextActive]}>{label as string}</Text></Pressable>})}</View><Pressable onPress={onRegister} style={s.quickRegisterButton}><Text style={s.quickRegisterText}>등록하기</Text><ChevronRight size={22} color={colors.primary}/></Pressable></View>}
 
 const s=StyleSheet.create({
